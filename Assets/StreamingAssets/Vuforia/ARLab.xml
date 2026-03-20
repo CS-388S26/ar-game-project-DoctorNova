@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig>
+  <Tracking>
+    <ImageTarget name="start-game" size="0.297000 0.420292" />
+    <ImageTarget name="homer" size="0.200000 0.264463" />
+  </Tracking>
+</QCARConfig>
