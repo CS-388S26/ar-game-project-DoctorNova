@@ -92,9 +92,9 @@ public class GameManager : MonoBehaviour
     void UpdateUI()
     {
         if (heightText != null)
-            heightText.text = "Height: " + currentHeight;
+            heightText.text = "Score: " + Mathf.RoundToInt(currentHeight * 100);
 
         if (highScoreText != null)
-            highScoreText.text = "Best: " + highScore;
+            highScoreText.text = "Highscore: " + Mathf.RoundToInt(highScore * 100);
     }
 }
