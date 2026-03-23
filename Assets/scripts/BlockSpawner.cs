@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class BlockSpawner : MonoBehaviour
 {
@@ -25,8 +24,7 @@ public class BlockSpawner : MonoBehaviour
 
         MoveBlock();
 
-        // GetMouseButtonDown also is true if the player touches the screen on his phone
-        if (Input.GetMouseButtonDown(0))
+        if (Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
         {
             // Move the spawner up so that it doesn't block new blocks
             transform.position = transform.position + new Vector3(0, 0.3f, 0);
