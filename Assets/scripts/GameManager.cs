@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using Vuforia;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class GameManager : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class GameManager : MonoBehaviour
     public bool gameOver = false;
     public bool gameCountdown = false;
 
+    public BlockSpawner spawner;
+
     private float countdown = 3;
 
     // PlaneFinder reference
@@ -32,8 +35,13 @@ public class GameManager : MonoBehaviour
     // Start the game with a countdown for the player to get ready
     public void StartCountdown()
     {
+        if (gameCountdown || gameStarted)
+        {
+            return;
+        }
+
         gameCountdown = true;
-        countdown = 5;
+        countdown = 6;
     }
 
     private void Update()
@@ -43,21 +51,24 @@ public class GameManager : MonoBehaviour
         {
             countdown -= Time.deltaTime;
 
+            // Update countdown in HUD
+            CountdownText.text = ((int)countdown).ToString();
+
             if (countdown <= 0)
             {
+                CountdownText.text = "";
                 countdown = 0;
                 gameCountdown = false;
                 StartGame();
             }
 
-            // Update countdown in HUD
-            CountdownText.text = ((int)countdown).ToString();
         }
     }
 
     // Function to start the game after the countdown finished
     private void StartGame()
     {
+        spawner.SpawnBlock();
         gameStarted = true;
         gameOver = false;
         currentHeight = 0;
@@ -74,6 +85,8 @@ public class GameManager : MonoBehaviour
     public void AddBlock(float yPosition)
     {
         if (gameOver) return;
+
+        yPosition = yPosition - spawner.platform.transform.position.y;
 
         if (yPosition > currentHeight)
         {
@@ -92,6 +105,9 @@ public class GameManager : MonoBehaviour
     // End the game if the player lost
     public void EndGame()
     {
+        CountdownText.text = "Game over";
+
+        spawner.Reset();
         gameOver = true;
         gameStarted = false;
 

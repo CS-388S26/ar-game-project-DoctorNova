@@ -1,9 +1,11 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class BlockSpawner : MonoBehaviour
 {
     public GameObject blockPrefab;
+    public GameObject platform;
     public float moveRange = 1.5f;
     public float speed = 2f;
     public float spawnHeight = 3f;
@@ -11,10 +13,23 @@ public class BlockSpawner : MonoBehaviour
     private GameObject currentBlock;
     private bool movingRight = true;
 
+    private float initialY = 0.4f;
+
+    private void Awake()
+    {
+        initialY = transform.position.y;
+    }
+
+    public void Reset()
+    {
+        transform.position = new Vector3(transform.position.x, initialY, transform.position.z);
+        Block.blocks.ForEach(block => Destroy(block.gameObject));
+        Block.blocks.Clear();
+    }
+
     void Start()
     {
-        // Spawn first block
-        SpawnBlock();
+        Reset();
     }
 
     void Update()
@@ -27,7 +42,7 @@ public class BlockSpawner : MonoBehaviour
         if (Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
         {
             // Move the spawner up so that it doesn't block new blocks
-            transform.position = transform.position + new Vector3(0, 0.3f, 0);
+            transform.position = new Vector3(transform.position.x, initialY + GameManager.Instance.currentHeight, transform.position.z);
             DropBlock();
         }
     }
@@ -38,17 +53,23 @@ public class BlockSpawner : MonoBehaviour
         if (currentBlock == null) return;
 
         float dir = movingRight ? 1 : -1;
-        currentBlock.transform.Translate(Vector3.right * dir * speed * Time.deltaTime);
+        currentBlock.transform.position = currentBlock.transform.position + (Vector3.right * dir * speed * Time.deltaTime);
 
-        if (Mathf.Abs(currentBlock.transform.localPosition.x) > moveRange)
+        if (movingRight && currentBlock.transform.localPosition.x > moveRange || 
+            !movingRight && currentBlock.transform.localPosition.x < -moveRange)
             movingRight = !movingRight;
     }
 
     // Spawn a new block
-    void SpawnBlock()
+    public void SpawnBlock()
     {
+        if (currentBlock != null)
+        {
+            Block.blocks.Remove(currentBlock.GetComponent<Block>());
+            Destroy(currentBlock);
+        }
+
         currentBlock = Instantiate(blockPrefab, transform);
-        currentBlock.transform.localPosition = new Vector3(0, spawnHeight, 0);
     }
 
     // Drop the block straight down
